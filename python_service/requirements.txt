@@ -1,0 +1,21 @@
+# FastAPI and server
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+python-multipart==0.0.9
+
+# PDF processing
+pypdf2==3.0.1
+
+# Data validation
+pydantic==2.9.2
+pydantic-settings==2.5.2
+
+# AI/ML (future use)
+# openai==1.50.0
+# langchain==0.3.0
+# numpy==1.26.4
+# scikit-learn==1.5.2
+
+# Utilities
+python-dotenv==1.0.1
+httpx==0.27.2
