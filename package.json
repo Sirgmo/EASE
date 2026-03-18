@@ -26,6 +26,7 @@
     "@aws-sdk/s3-request-presigner": "^3.1012.0",
     "@clerk/nextjs": "^7.0.5",
     "@neondatabase/serverless": "^1.0.2",
+    "@vercel/analytics": "^2.0.1",
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.45.1",
     "lucide-react": "^0.562.0",
@@ -33,6 +34,7 @@
     "postgres": "^3.4.8",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
+    "svix": "^1.88.0",
     "tailwind-merge": "^3.4.0",
     "zod": "^4.3.6"
   },
