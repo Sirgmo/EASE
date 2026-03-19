@@ -22,6 +22,13 @@ const envSchema = z.object({
   R2_BUCKET_NAME: z.string().min(1),
   // Application
   NEXT_PUBLIC_APP_URL: z.string().url(),
+  // Repliers MLS API (server-side only — never expose to browser)
+  REPLIERS_API_KEY: z.string().min(1),
+  // Mapbox (public — used in browser for map tiles)
+  NEXT_PUBLIC_MAPBOX_TOKEN: z.string().min(1),
+  // Upstash Redis (serverless cache for Repliers API responses)
+  UPSTASH_REDIS_REST_URL: z.string().url(),
+  UPSTASH_REDIS_REST_TOKEN: z.string().min(1),
 })
 
 export const env = envSchema.parse(process.env)
