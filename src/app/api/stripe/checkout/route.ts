@@ -13,13 +13,6 @@ const TIER_PRICE_IDS: Record<string, string> = {
   ai_full_service: process.env.STRIPE_PRICE_AI_FULL_SERVICE!,
 }
 
-// Human-readable tier metadata (for Stripe session description)
-const TIER_LABELS: Record<string, { label: string; amountCents: number }> = {
-  ai_diy: { label: 'AI DIY', amountCents: 999_00 },
-  ai_coordinator: { label: 'AI + Coordinator', amountCents: 2500_00 },
-  ai_full_service: { label: 'AI + Full Service', amountCents: 5000_00 },
-}
-
 export async function POST(req: Request): Promise<Response> {
   // Auth gate — must be signed in
   const { userId } = await auth()

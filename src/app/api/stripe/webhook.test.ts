@@ -19,7 +19,6 @@ vi.mock('stripe', () => {
       constructEvent: vi.fn(),
     },
   }))
-  mockStripe.default = mockStripe
   return { default: mockStripe }
 })
 
@@ -46,8 +45,6 @@ describe('POST /api/stripe/webhook', () => {
   it('duplicate stripeSessionId is ignored — returns { received: true } without db.update', async () => {
     const { stripe } = await import('@/lib/stripe')
     const { db } = await import('@/db')
-    const { transactions } = await import('@/db/schema/transactions')
-    const { eq } = await import('drizzle-orm')
 
     const sessionId = 'cs_test_duplicate_123'
     const transactionId = 'tx-uuid-123'
