@@ -97,13 +97,8 @@ describe('isValidTransition — CANCELLED reachable from all non-terminals', () 
   })
 
   it('every non-terminal status can transition to CANCELLED', () => {
-    const nonTerminals = ['DRAFT', 'OFFER_PENDING', 'OFFER_SUBMITTED', 'OFFER_ACCEPTED', 'CONDITIONS_PENDING', 'CONDITIONS_WAIVED', 'CLOSING'] as const
-    for (const status of nonTerminals) {
-      const validTargets = VALID_TRANSITIONS[status]
-      // Each non-terminal should have CANCELLED as a valid target (except CONDITIONS_WAIVED which goes to CLOSING only)
-      // Note: CONDITIONS_WAIVED -> CLOSING only per the plan spec
-    }
-    // Verify all except CONDITIONS_WAIVED can reach CANCELLED
+    // Verify all non-terminal statuses except CONDITIONS_WAIVED can reach CANCELLED directly
+    // CONDITIONS_WAIVED -> CLOSING only per spec (conditions waived = deal proceeds)
     const canCancelDirectly = ['DRAFT', 'OFFER_PENDING', 'OFFER_SUBMITTED', 'OFFER_ACCEPTED', 'CONDITIONS_PENDING', 'CLOSING'] as const
     for (const status of canCancelDirectly) {
       expect(isValidTransition(status, 'CANCELLED')).toBe(true)
@@ -114,9 +109,10 @@ describe('isValidTransition — CANCELLED reachable from all non-terminals', () 
 describe('getStepsForStatus — step status calculation', () => {
   it('getStepsForStatus(DRAFT) returns first step as current, rest as upcoming', () => {
     const steps = getStepsForStatus('DRAFT')
-    expect(steps[0].status).toBe('current')
+    // BUYER_STEPS has 8 elements, all indices are known-valid
+    expect(steps[0]!.status).toBe('current')
     for (let i = 1; i < steps.length; i++) {
-      expect(steps[i].status).toBe('upcoming')
+      expect(steps[i]!.status).toBe('upcoming')
     }
   })
 
@@ -124,23 +120,23 @@ describe('getStepsForStatus — step status calculation', () => {
     const steps = getStepsForStatus('CONDITIONS_PENDING')
     // BUYER_STEPS order: start, offer, review, negotiate, conditions, waiver, closing, done
     // CONDITIONS_PENDING is activeAt index 4 (0-based: start=0, offer=1, review=2, negotiate=3, conditions=4)
-    expect(steps[0].status).toBe('completed') // start
-    expect(steps[1].status).toBe('completed') // offer
-    expect(steps[2].status).toBe('completed') // review
-    expect(steps[3].status).toBe('completed') // negotiate
-    expect(steps[4].status).toBe('current')   // conditions
-    expect(steps[5].status).toBe('upcoming')  // waiver
-    expect(steps[6].status).toBe('upcoming')  // closing
-    expect(steps[7].status).toBe('upcoming')  // done
+    expect(steps[0]!.status).toBe('completed') // start
+    expect(steps[1]!.status).toBe('completed') // offer
+    expect(steps[2]!.status).toBe('completed') // review
+    expect(steps[3]!.status).toBe('completed') // negotiate
+    expect(steps[4]!.status).toBe('current')   // conditions
+    expect(steps[5]!.status).toBe('upcoming')  // waiver
+    expect(steps[6]!.status).toBe('upcoming')  // closing
+    expect(steps[7]!.status).toBe('upcoming')  // done
   })
 
   it('getStepsForStatus(CLOSED) returns all steps as completed except last which is current', () => {
     const steps = getStepsForStatus('CLOSED')
     // CLOSED is the last step (done, activeAt: ['CLOSED'])
     for (let i = 0; i < steps.length - 1; i++) {
-      expect(steps[i].status).toBe('completed')
+      expect(steps[i]!.status).toBe('completed')
     }
-    expect(steps[steps.length - 1].status).toBe('current')
+    expect(steps[steps.length - 1]!.status).toBe('current')
   })
 
   it('getStepsForStatus returns correct number of steps', () => {
