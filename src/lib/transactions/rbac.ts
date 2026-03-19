@@ -20,11 +20,50 @@ export { getTransactionRole } from '@/db/schema/transactionParties'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
+// TransactionDashboardData uses Date | string for timestamp fields because:
+//   - Server-side (fetchTransactionForRole): Drizzle returns Date objects
+//   - Client-side (SSE JSON): JSON.parse turns dates into ISO strings
+// Both callers (the server page and the client SSE handler) use this same type.
 export type TransactionDashboardData = {
-  transaction: typeof transactions.$inferSelect
-  events: (typeof transactionEvents.$inferSelect)[]
-  conditions: (typeof transactionConditions.$inferSelect)[]
-  parties: (typeof transactionParties.$inferSelect)[]
+  transaction: {
+    id: string
+    buyerId: string
+    mlsNumber: string
+    status: string
+    serviceTier: string | null
+    stripeSessionId: string | null
+    createdAt: Date | string
+    updatedAt: Date | string
+  }
+  events: Array<{
+    id: string
+    transactionId: string
+    fromStatus: string | null
+    toStatus: string
+    actorId: string | null
+    note: string | null
+    sortKey: number
+    createdAt: Date | string
+  }>
+  conditions: Array<{
+    id: string
+    transactionId: string
+    conditionType: string
+    deadlineAt: Date | string
+    waivedAt: Date | string | null
+    reminder48hSentAt: Date | string | null
+    reminder24hSentAt: Date | string | null
+    reminder4hSentAt: Date | string | null
+    createdAt: Date | string
+  }>
+  parties: Array<{
+    id: string
+    transactionId: string
+    userId: string
+    role: string
+    joinedAt: Date | string
+    isActive: boolean
+  }>
   viewerRole: string
 }
 
