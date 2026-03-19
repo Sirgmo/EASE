@@ -47,7 +47,7 @@ describe('repliers client', () => {
     const params = new URLSearchParams({ city: 'Toronto', status: 'A' })
     const result = await searchListings(params)
     expect(result.listings).toHaveLength(1)
-    expect(result.listings[0].mlsNumber).toBe('C12345678')
+    expect(result.listings[0]?.mlsNumber).toBe('C12345678')
   })
 
   it('searchListings: fetch is called with REPLIERS-API-KEY header (key never returned to caller)', async () => {
@@ -57,9 +57,10 @@ describe('repliers client', () => {
     })
     const { searchListings } = await import('./repliers')
     await searchListings(new URLSearchParams())
-    const [, options] = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0]
-    expect(options.headers['REPLIERS-API-KEY']).toBeDefined()
-    expect(options.headers['REPLIERS-API-KEY']).not.toBe('')
+    const firstCall = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0]
+    const options = firstCall?.[1] as { headers: Record<string, string> }
+    expect(options?.headers['REPLIERS-API-KEY']).toBeDefined()
+    expect(options?.headers['REPLIERS-API-KEY']).not.toBe('')
   })
 
   it('getListing: returns single listing by mlsNumber', async () => {
