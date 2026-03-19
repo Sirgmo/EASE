@@ -33,6 +33,14 @@ const envSchema = z.object({
   RESEND_API_KEY: z.string().startsWith('re_'),
   // Vercel cron security secret (generate: openssl rand -hex 32)
   CRON_SECRET: z.string().min(32),
+  // Stripe payment processing (service tier selection)
+  // Note: Stripe-specific files access these via process.env directly (same pattern as CRON_SECRET)
+  // to avoid Zod parse blocking cold-start when env vars absent in test environments
+  STRIPE_SECRET_KEY: z.string().startsWith('sk_'),
+  STRIPE_WEBHOOK_SECRET: z.string().startsWith('whsec_'),
+  STRIPE_PRICE_AI_DIY: z.string().startsWith('price_'),
+  STRIPE_PRICE_AI_COORDINATOR: z.string().startsWith('price_'),
+  STRIPE_PRICE_AI_FULL_SERVICE: z.string().startsWith('price_'),
 })
 
 export const env = envSchema.parse(process.env)

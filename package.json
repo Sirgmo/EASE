@@ -41,6 +41,7 @@
     "react-map-gl": "^8.1.0",
     "recharts": "^3.8.0",
     "resend": "^6.9.4",
+    "stripe": "^20.4.1",
     "supercluster": "^8.0.1",
     "svix": "^1.88.0",
     "tailwind-merge": "^3.4.0",
