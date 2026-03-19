@@ -77,9 +77,15 @@ describe('calculateLTT — Toronto double LTT', () => {
 
   it('$3,500,000 Toronto: luxury bracket (4.40%) applied above $3M', () => {
     const result = calculateLTT(3_500_000, ONTARIO_BRACKETS, TORONTO_BRACKETS, false)
-    // Toronto at $3M: 275+1950+2250+32000+20000 = 56475
-    // Luxury: 500000 * 0.044 = 22000
-    expect(result.municipalLTT).toBe(78_475)
+    // Toronto at $3.5M (marginal calculation):
+    // $0–$55k:      55,000 * 0.005  =  275
+    // $55k–$250k:  195,000 * 0.010  = 1,950
+    // $250k–$400k: 150,000 * 0.015  = 2,250
+    // $400k–$2M: 1,600,000 * 0.020  = 32,000
+    // $2M–$3M:   1,000,000 * 0.025  = 25,000  (standard Toronto bracket)
+    // $3M–$3.5M:   500,000 * 0.044  = 22,000  (luxury bracket, April 1 2026)
+    // Total = 83,475
+    expect(result.municipalLTT).toBe(83_475)
   })
 })
 
