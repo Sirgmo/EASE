@@ -28,17 +28,13 @@ function hoursFromNow(hours: number): Date {
   return new Date(NOW.getTime() + hours * 60 * 60 * 1000)
 }
 
-// Helper: offset minutes from NOW
-function minutesFromNow(minutes: number): Date {
-  return new Date(NOW.getTime() + minutes * 60 * 1000)
-}
 
 describe('findConditionsInWindow — 48h window', () => {
   it('returns condition when deadlineAt is exactly 48h from now and reminder48hSentAt is null', () => {
     const condition = makeCondition({ deadlineAt: hoursFromNow(48) })
     const result = findConditionsInWindow([condition], 48, NOW)
     expect(result).toHaveLength(1)
-    expect(result[0].id).toBe('cond-1')
+    expect(result[0]!.id).toBe('cond-1')
   })
 
   it('returns empty when deadlineAt is 48h from now but reminder48hSentAt is already set', () => {
@@ -137,7 +133,7 @@ describe('findConditionsInWindow — edge cases', () => {
     ]
     const result = findConditionsInWindow(conditions, 48, NOW)
     expect(result).toHaveLength(1)
-    expect(result[0].id).toBe('cond-1')
+    expect(result[0]!.id).toBe('cond-1')
   })
 
   it('returns empty array when conditions array is empty', () => {

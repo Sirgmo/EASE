@@ -3,6 +3,10 @@
     {
       "path": "/api/cron/check-saved-searches",
       "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/cron/check-deadlines",
+      "schedule": "*/30 * * * *"
     }
   ]
 }
