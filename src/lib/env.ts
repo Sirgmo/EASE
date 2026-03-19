@@ -29,6 +29,10 @@ const envSchema = z.object({
   // Upstash Redis (serverless cache for Repliers API responses)
   UPSTASH_REDIS_REST_URL: z.string().url(),
   UPSTASH_REDIS_REST_TOKEN: z.string().min(1),
+  // Resend transactional email (saved search alert notifications)
+  RESEND_API_KEY: z.string().startsWith('re_'),
+  // Vercel cron security secret (generate: openssl rand -hex 32)
+  CRON_SECRET: z.string().min(32),
 })
 
 export const env = envSchema.parse(process.env)

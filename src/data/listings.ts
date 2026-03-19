@@ -60,7 +60,7 @@ const IMAGES = {
 
 function getImage(type: string, index: number): string {
   const images = IMAGES[type as keyof typeof IMAGES] || IMAGES.condo;
-  return images[index % images.length];
+  return images[index % images.length]!;
 }
 
 export const MOCK_LISTINGS: PropertyListing[] = [

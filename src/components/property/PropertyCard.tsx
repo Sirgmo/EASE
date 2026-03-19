@@ -1,6 +1,7 @@
 // src/components/property/PropertyCard.tsx
 import Link from 'next/link'
 import { Bed, Bath, Square } from 'lucide-react'
+import { FavouriteButton } from '@/components/property/FavouriteButton'
 import type { RepliersListing } from '@/types/repliers'
 
 interface PropertyCardProps {
@@ -27,6 +28,9 @@ export function PropertyCard({ listing }: PropertyCardProps) {
           )}
           <div className="absolute bottom-2 right-2 rounded-full bg-black/60 px-2 py-0.5 text-xs text-white">
             {daysOnMarket}d on market
+          </div>
+          <div className="absolute right-2 top-2">
+            <FavouriteButton mlsNumber={mlsNumber} address={addressStr} listPrice={listPrice} />
           </div>
         </div>
 

@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { PropertyMapWrapper } from '@/components/property/PropertyMapWrapper'
 import { PropertyCard } from '@/components/property/PropertyCard'
+import { SaveSearchButton } from '@/components/search/SaveSearchButton'
 import type { RepliersListing, RepliersSearchResponse } from '@/types/repliers'
 
 export default function SearchClient() {
@@ -71,6 +72,9 @@ export default function SearchClient() {
         {listings.length > 0 && (
           <p className="mt-4 text-xs text-secondary-400">{listings.length} active listings</p>
         )}
+        <div className="mt-4">
+          <SaveSearchButton criteria={{ city }} />
+        </div>
       </aside>
 
       {/* Main content: map or list */}
