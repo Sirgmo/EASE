@@ -1,11 +1,25 @@
 import crypto from 'crypto'
-import type { ApiClient as ApiClientType } from 'docusign-esign'
 
-// docusign-esign ships interfaces-only types; use require to access runtime class constructors
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const docusign = require('docusign-esign') as {
-  ApiClient: new () => ApiClientType
-  EnvelopesApi: new (client: ApiClientType) => {
+// ─── Minimal local interface — avoids importing docusign-esign types at build time ─────────────
+// Using a local interface instead of `import type { ApiClient } from 'docusign-esign'` prevents
+// Turbopack from tracing into the docusign-esign package during production builds.
+// docusign-esign uses AMD define() which Turbopack (Next.js 16 production bundler) cannot parse.
+interface DocuSignApiClient {
+  setBasePath(path: string): void
+  requestJWTUserToken(
+    integrationKey: string,
+    userId: string,
+    scopes: string[],
+    privateKey: Buffer,
+    tokenLifetimeSecs: number
+  ): Promise<{ body: { access_token?: string } }>
+  addDefaultHeader(key: string, value: string): void
+  getUserInfo(token: string): Promise<unknown>
+}
+
+type DocuSignModule = {
+  ApiClient: new () => DocuSignApiClient
+  EnvelopesApi: new (client: DocuSignApiClient) => {
     createEnvelope(accountId: string, opts: { envelopeDefinition: unknown }): Promise<{ envelopeId?: string }>
     createRecipientView(accountId: string, envelopeId: string, opts: { recipientViewRequest: unknown }): Promise<{ url?: string }>
   }
@@ -15,6 +29,11 @@ const docusign = require('docusign-esign') as {
   Recipients: new () => Record<string, unknown>
   RecipientViewRequest: new () => Record<string, unknown>
 }
+
+// Lazy-load docusign-esign at runtime to prevent Turbopack from statically tracing its AMD modules.
+// Top-level require() is traced by Turbopack; function-level require() is not.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+function getDocuSignModule(): DocuSignModule { return require('docusign-esign') as DocuSignModule }
 
 // ─── Pure utility (exported for testability — no HTTP, no SDK) ────────────────
 
@@ -52,7 +71,8 @@ export function verifyDocuSignHmac(rawBody: Buffer, signature: string, secret: s
  * Calls getUserInfo() to get the account-specific base URI — never hardcoded.
  * Catches consent_required and throws with actionable admin message.
  */
-export async function getDocuSignApiClient(): Promise<ApiClientType> {
+export async function getDocuSignApiClient(): Promise<DocuSignApiClient> {
+  const docusign = getDocuSignModule()
   const apiClient = new docusign.ApiClient()
 
   // Initial base path for JWT grant — will be overridden by getUserInfo() result
@@ -120,6 +140,7 @@ export interface EmbeddedSigningOptions {
 export async function createEmbeddedSigningUrl(
   opts: EmbeddedSigningOptions
 ): Promise<{ signingUrl: string; envelopeId: string }> {
+  const docusign = getDocuSignModule()
   const apiClient = await getDocuSignApiClient()
   const envelopesApi = new docusign.EnvelopesApi(apiClient)
   const accountId = process.env.DOCUSIGN_ACCOUNT_ID!

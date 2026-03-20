@@ -4,9 +4,6 @@
 // in the ESM types resolution path. Using ts-expect-error suppresses this while keeping the
 // runtime import working. Vitest mocks pdf-parse as { default: fn } which the ESM import resolves.
 import { GetObjectCommand } from '@aws-sdk/client-s3'
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-expect-error — pdf-parse CJS types don't export a default in ESM resolution
-import pdfParse from 'pdf-parse'
 import { r2 } from '@/lib/r2'
 import { env } from '@/lib/env'
 
@@ -21,6 +18,13 @@ export async function extractPdfTextFromR2(r2Key: string): Promise<string> {
   }
   const bytes = await response.Body.transformToByteArray()
   const buffer = Buffer.from(bytes)
-  const data = await pdfParse(buffer)
+
+  // Lazy require prevents Turbopack from statically tracing pdf-parse (CJS/AMD module).
+  // Top-level static imports of pdf-parse cause AMD define() errors in Turbopack builds.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-explicit-any
+  const pdfParseModule = require('pdf-parse') as any
+  const pdfParse = pdfParseModule.default ?? pdfParseModule
+
+  const data = await (pdfParse as (buf: Buffer) => Promise<{ text: string }>)(buffer)
   return data.text
 }
