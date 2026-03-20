@@ -24,7 +24,25 @@ vi.mock('next/headers', () => ({
 
 const validToken = 'aaaabbbb-cccc-dddd-eeee-ffffffffffff'
 
-const validInvitation = {
+interface MockInvitation {
+  id: string
+  transactionId: string
+  invitedEmail: string
+  role: string
+  token: string
+  expiresAt: Date
+  usedAt: Date | null
+  invitedByUserId: string
+  createdAt: Date
+}
+
+interface MockUser {
+  id: string
+  clerkId: string
+  email: string
+}
+
+const validInvitation: MockInvitation = {
   id: '11111111-1111-1111-1111-111111111111',
   transactionId: '22222222-2222-2222-2222-222222222222',
   invitedEmail: 'lawyer@example.com',
@@ -36,14 +54,14 @@ const validInvitation = {
   createdAt: new Date(),
 }
 
-const existingUser = {
+const existingUser: MockUser = {
   id: '44444444-4444-4444-4444-444444444444',
   clerkId: 'clerk_test_user',
   email: 'lawyer@example.com',
 }
 
-let mockInvitation: typeof validInvitation | null = { ...validInvitation }
-let mockUser: typeof existingUser | null = { ...existingUser }
+let mockInvitation: MockInvitation | null = { ...validInvitation }
+let mockUser: MockUser | null = { ...existingUser }
 let selectCallCount = 0
 
 vi.mock('@/db', () => ({
