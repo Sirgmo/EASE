@@ -6,7 +6,7 @@ export interface ComparableSale {
   salePrice: number
   listPrice: number
   soldDate: string
-  squareFootage?: number
+  squareFootage?: number | undefined
   bedrooms: number
   bathrooms: number
   daysOnMarket: number
@@ -19,7 +19,7 @@ export interface ListingData {
   propertyType: string
   bedrooms: number
   bathrooms: number
-  squareFootage?: number
+  squareFootage?: number | undefined
   daysOnMarket: number
   neighbourhood: string
 }

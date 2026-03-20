@@ -5,11 +5,11 @@ export interface PropertyData {
   mlsNumber: string
   address: string
   listPrice: number
-  assessedValue?: number
-  yearBuilt?: number
+  assessedValue?: number | undefined
+  yearBuilt?: number | undefined
   propertyType: string
   neighbourhood: string
-  daysOnMarket?: number
+  daysOnMarket?: number | undefined
 }
 
 export function buildRiskScorePrompt(propertyData: PropertyData): string {

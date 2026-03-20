@@ -2,9 +2,9 @@
 // Pure function — no side effects, no API calls. Unit testable without mocking.
 
 export interface ChatContext {
-  transactionStatus?: string
-  mlsNumber?: string
-  coordinatorEmail?: string
+  transactionStatus?: string | undefined
+  mlsNumber?: string | undefined
+  coordinatorEmail?: string | undefined
 }
 
 export function buildChatSystemPrompt(context: ChatContext): string {
