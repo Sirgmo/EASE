@@ -12,6 +12,8 @@ import { properties } from '@/db/schema/properties'
 import { PhotoGallery } from '@/components/property/PhotoGallery'
 import { PriceHistoryChart } from '@/components/property/PriceHistoryChart'
 import { ListingFacts } from '@/components/property/ListingFacts'
+import { RiskScoreCard } from '@/components/ai/RiskScoreCard'
+import { OfferStrategyPanel } from '@/components/ai/OfferStrategyPanel'
 import type { RepliersListing } from '@/types/repliers'
 
 interface PropertyPageProps {
@@ -146,6 +148,37 @@ export default async function PropertyDetailPage({ params }: PropertyPageProps) 
           Price History
         </h2>
         <PriceHistoryChart history={history!} currentPrice={listPrice} />
+      </section>
+
+      {/* AI tools — Risk Score + Offer Strategy */}
+      <section>
+        <h2 className="mb-4 font-display text-xl font-semibold text-secondary-900">
+          AI Analysis
+        </h2>
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <RiskScoreCard
+            mlsNumber={listing!.mlsNumber}
+            address={addressStr}
+            listPrice={listPrice}
+            {...(listing!.details.yearBuilt && parseInt(listing!.details.yearBuilt, 10)
+              ? { yearBuilt: parseInt(listing!.details.yearBuilt, 10) }
+              : {})}
+            propertyType={listing!.details.propertyType}
+            neighbourhood={listing!.address.neighborhood ?? listing!.address.area}
+            daysOnMarket={listing!.daysOnMarket}
+          />
+          <OfferStrategyPanel
+            mlsNumber={listing!.mlsNumber}
+            address={addressStr}
+            listPrice={listPrice}
+            propertyType={listing!.details.propertyType}
+            bedrooms={listing!.details.numBedrooms}
+            bathrooms={listing!.details.numBathrooms}
+            daysOnMarket={listing!.daysOnMarket}
+            neighbourhood={listing!.address.neighborhood ?? listing!.address.area}
+            comparableSales={[]}
+          />
+        </div>
       </section>
     </div>
   )

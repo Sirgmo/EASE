@@ -14,6 +14,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import type { TransactionDashboardData } from '@/lib/transactions/rbac'
+import { ChatPanel } from '@/components/ai/ChatPanel'
 
 export type { TransactionDashboardData }
 
@@ -358,6 +359,15 @@ export function TransactionDashboard({ transactionId, initialData }: Transaction
           )}
         </div>
 
+      </div>
+
+      {/* ── AI Assistant ── */}
+      <div className="mt-4">
+        <ChatPanel
+          transactionId={transactionId}
+          transactionStatus={transaction.status}
+          mlsNumber={transaction.mlsNumber}
+        />
       </div>
 
       {/* ── Back link ── */}
