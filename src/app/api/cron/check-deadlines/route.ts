@@ -5,6 +5,8 @@
 //
 // IMPORTANT: CRON_SECRET uses process.env directly — avoids Zod schema parse blocking cold-start
 // IMPORTANT: Resend is instantiated inside handler (not module-level) to prevent cold-start failures
+export const dynamic = 'force-dynamic'
+
 import { db } from '@/db'
 import { isNull, eq } from 'drizzle-orm'
 import { transactionConditions, transactions } from '@/db/schema/transactions'

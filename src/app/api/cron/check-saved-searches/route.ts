@@ -2,6 +2,8 @@
 // Vercel cron endpoint — runs hourly (Pro) or daily (Hobby)
 // Security: Vercel sends CRON_SECRET as Authorization: Bearer {secret}
 // Idempotency: INSERT ... ON CONFLICT DO NOTHING on search_alert_log
+export const dynamic = 'force-dynamic'
+
 import { NextResponse } from 'next/server'
 import { db } from '@/db'
 import { savedSearches } from '@/db/schema/savedSearches'
