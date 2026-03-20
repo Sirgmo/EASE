@@ -1,9 +1,16 @@
 // src/lib/stripe.ts
-// Stripe client singleton
-// Uses process.env directly (not env.ts) to avoid Zod parse blocking cold-start
-// when STRIPE_SECRET_KEY is absent in test environments (same pattern as CRON_SECRET)
+// Stripe client singleton — lazy initialization prevents build-time throw when env vars absent.
+// Uses process.env directly (not env.ts) — same pattern as CRON_SECRET.
+// The Proxy defers `new Stripe()` until the first property access at request time.
 import Stripe from 'stripe'
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  typescript: true,
+let _stripe: Stripe | undefined
+
+export const stripe: Stripe = new Proxy({} as Stripe, {
+  get(_target, prop) {
+    if (!_stripe) {
+      _stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { typescript: true })
+    }
+    return (_stripe as unknown as Record<string | symbol, unknown>)[prop]
+  },
 })

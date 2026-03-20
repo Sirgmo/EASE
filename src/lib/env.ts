@@ -49,5 +49,14 @@ const envSchema = z.object({
   ANTHROPIC_API_KEY: z.string().startsWith('sk-ant-').optional(),
 })
 
-export const env = envSchema.parse(process.env)
+// During `next build`, Next.js sets NEXT_PHASE=phase-production-build and
+// imports route modules to check for static/dynamic exports. Env vars are
+// absent at that point. We skip validation during build and return a typed
+// empty object — build-time code must never make real DB or API calls.
+// Real validation (and any missing-var throw) fires at runtime instead.
+export const env: z.infer<typeof envSchema> =
+  process.env.NEXT_PHASE === 'phase-production-build'
+    ? ({} as z.infer<typeof envSchema>)
+    : envSchema.parse(process.env)
+
 export type Env = z.infer<typeof envSchema>

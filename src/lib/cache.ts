@@ -1,12 +1,22 @@
 // src/lib/cache.ts
 // Upstash Redis cache helpers — HTTP-based, serverless-safe (no TCP connection pooling)
-// Source: @upstash/redis docs (redis.upstash.com)
+// Lazy singleton — Redis() is called on first use, NOT at module load time.
+// This allows Next.js to complete its build-time phase without UPSTASH env vars present.
+// Uses process.env directly (not env.ts) — same pattern as CRON_SECRET/STRIPE_SECRET_KEY.
 import { Redis } from '@upstash/redis'
-import { env } from '@/lib/env'
 
-export const redis = new Redis({
-  url: env.UPSTASH_REDIS_REST_URL,
-  token: env.UPSTASH_REDIS_REST_TOKEN,
+let _redis: Redis | undefined
+
+export const redis: Redis = new Proxy({} as Redis, {
+  get(_target, prop) {
+    if (!_redis) {
+      _redis = new Redis({
+        url: process.env.UPSTASH_REDIS_REST_URL!,
+        token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+      })
+    }
+    return (_redis as unknown as Record<string | symbol, unknown>)[prop]
+  },
 })
 
 export async function getCached<T>(key: string): Promise<T | null> {
