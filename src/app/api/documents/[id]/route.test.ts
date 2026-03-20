@@ -1,24 +1,27 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { GET } from './route'
 
-const mockDocument = {
-  id: '00000000-0000-0000-0000-000000000010',
-  transactionId: '00000000-0000-0000-0000-000000000001',
-  r2Key: 'transactions/tx1/docs/test.pdf',
-  fileName: 'test.pdf',
-  fileSizeBytes: 50000,
-  contentType: 'application/pdf',
-  category: 'other',
-  isActive: true,
-  createdAt: new Date(),
-}
+// Valid v4 UUIDs (Zod v4 enforces version nibble must be 1-8)
+const DOC_ID = 'b0000000-0000-4000-8000-000000000010'
 
+// Cannot reference module-level variables in vi.mock factory (hoisting issue).
+// Use inline object instead.
 vi.mock('@/db', () => ({
   db: {
     select: vi.fn().mockReturnValue({
       from: vi.fn().mockReturnValue({
         where: vi.fn().mockReturnValue({
-          limit: vi.fn().mockResolvedValue([mockDocument]),
+          limit: vi.fn().mockResolvedValue([{
+            id: 'b0000000-0000-4000-8000-000000000010',
+            transactionId: 'a0000000-0000-4000-8000-000000000001',
+            r2Key: 'transactions/tx1/docs/test.pdf',
+            fileName: 'test.pdf',
+            fileSizeBytes: 50000,
+            contentType: 'application/pdf',
+            category: 'other',
+            isActive: true,
+            createdAt: new Date(),
+          }]),
         }),
       }),
     }),
@@ -51,7 +54,10 @@ vi.mock('@aws-sdk/s3-request-presigner', () => ({
 }))
 
 vi.mock('@aws-sdk/client-s3', () => ({
-  GetObjectCommand: vi.fn().mockImplementation((args) => args),
+  // Use a class-style mock so `new GetObjectCommand(args)` works
+  GetObjectCommand: vi.fn().mockImplementation(function (args: unknown) {
+    return args
+  }),
 }))
 
 vi.mock('@/lib/env', () => ({
@@ -68,8 +74,8 @@ describe('GET /api/documents/[id] (download URL)', () => {
   it('returns 200 with presigned download URL when caller is a valid party', async () => {
     vi.mocked(getTransactionRole).mockResolvedValue('buyer')
 
-    const params = Promise.resolve({ id: '00000000-0000-0000-0000-000000000010' })
-    const request = new Request('http://localhost/api/documents/00000000-0000-0000-0000-000000000010')
+    const params = Promise.resolve({ id: DOC_ID })
+    const request = new Request(`http://localhost/api/documents/${DOC_ID}`)
 
     const response = await GET(request, { params })
     expect(response.status).toBe(200)
@@ -81,8 +87,8 @@ describe('GET /api/documents/[id] (download URL)', () => {
   it('returns 403 when caller is not a party to the document transaction', async () => {
     vi.mocked(getTransactionRole).mockResolvedValue(null)
 
-    const params = Promise.resolve({ id: '00000000-0000-0000-0000-000000000010' })
-    const request = new Request('http://localhost/api/documents/00000000-0000-0000-0000-000000000010')
+    const params = Promise.resolve({ id: DOC_ID })
+    const request = new Request(`http://localhost/api/documents/${DOC_ID}`)
 
     const response = await GET(request, { params })
     expect(response.status).toBe(403)
@@ -100,8 +106,9 @@ describe('GET /api/documents/[id] (download URL)', () => {
 
     vi.mocked(getTransactionRole).mockResolvedValue('buyer')
 
-    const params = Promise.resolve({ id: '00000000-0000-0000-0000-000000000099' })
-    const request = new Request('http://localhost/api/documents/00000000-0000-0000-0000-000000000099')
+    const missingId = 'c0000000-0000-4000-8000-000000000099'
+    const params = Promise.resolve({ id: missingId })
+    const request = new Request(`http://localhost/api/documents/${missingId}`)
 
     const response = await GET(request, { params })
     expect(response.status).toBe(404)

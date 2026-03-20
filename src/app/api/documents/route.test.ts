@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { GET, POST } from './route'
+import { POST } from './route'
 
 vi.mock('@/db', () => ({
   db: {
@@ -14,8 +14,8 @@ vi.mock('@/db', () => ({
     insert: vi.fn().mockReturnValue({
       values: vi.fn().mockReturnValue({
         returning: vi.fn().mockResolvedValue([{
-          id: '00000000-0000-0000-0000-000000000010',
-          transactionId: '00000000-0000-0000-0000-000000000001',
+          id: 'b0000000-0000-4000-8000-000000000010',
+          transactionId: 'a0000000-0000-4000-8000-000000000001',
           category: 'other',
           fileName: 'test.pdf',
           r2Key: 'transactions/tx1/docs/uuid-123',
@@ -53,6 +53,9 @@ vi.mock('next/headers', () => ({
 
 import { getTransactionRole } from '@/db/schema/transactionParties'
 
+// Valid v4 UUIDs (Zod v4 enforces version nibble must be 1-8)
+const TX_ID = 'a0000000-0000-4000-8000-000000000001'
+
 describe('POST /api/documents (save metadata)', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -73,7 +76,7 @@ describe('POST /api/documents (save metadata)', () => {
     const request = new Request('http://localhost/api/documents', {
       method: 'POST',
       body: JSON.stringify({
-        transactionId: '00000000-0000-0000-0000-000000000001',
+        transactionId: TX_ID,
         r2Key: 'transactions/tx1/docs/uuid-123',
         fileName: 'agreement.pdf',
         fileSizeBytes: 50000,
@@ -86,7 +89,7 @@ describe('POST /api/documents (save metadata)', () => {
     const response = await POST(request)
     expect(response.status).toBe(201)
     const body = await response.json()
-    expect(body.document.transactionId).toBe('00000000-0000-0000-0000-000000000001')
+    expect(body.document.transactionId).toBe(TX_ID)
   })
 
   it('returns 403 when caller is not a transaction party', async () => {
@@ -95,7 +98,7 @@ describe('POST /api/documents (save metadata)', () => {
     const request = new Request('http://localhost/api/documents', {
       method: 'POST',
       body: JSON.stringify({
-        transactionId: '00000000-0000-0000-0000-000000000001',
+        transactionId: TX_ID,
         r2Key: 'transactions/tx1/docs/uuid-123',
         fileName: 'test.pdf',
         fileSizeBytes: 50000,

@@ -35,7 +35,10 @@ vi.mock('@aws-sdk/s3-request-presigner', () => ({
 }))
 
 vi.mock('@aws-sdk/client-s3', () => ({
-  PutObjectCommand: vi.fn().mockImplementation((args) => args),
+  // Use a class-style mock so `new PutObjectCommand(args)` works
+  PutObjectCommand: vi.fn().mockImplementation(function (args: unknown) {
+    return args
+  }),
 }))
 
 vi.mock('@/lib/env', () => ({
@@ -43,6 +46,9 @@ vi.mock('@/lib/env', () => ({
 }))
 
 import { getTransactionRole } from '@/db/schema/transactionParties'
+
+// Valid v4 UUIDs (Zod v4 enforces version nibble must be 1-8)
+const TX_ID = 'a0000000-0000-4000-8000-000000000001'
 
 describe('POST /api/documents/presign', () => {
   beforeEach(() => {
@@ -55,7 +61,7 @@ describe('POST /api/documents/presign', () => {
     const request = new Request('http://localhost/api/documents/presign', {
       method: 'POST',
       body: JSON.stringify({
-        transactionId: '00000000-0000-0000-0000-000000000001',
+        transactionId: TX_ID,
         fileName: 'agreement.pdf',
         contentType: 'application/pdf',
         fileSizeBytes: 1_000_000,
@@ -76,7 +82,7 @@ describe('POST /api/documents/presign', () => {
     const request = new Request('http://localhost/api/documents/presign', {
       method: 'POST',
       body: JSON.stringify({
-        transactionId: '00000000-0000-0000-0000-000000000001',
+        transactionId: TX_ID,
         fileName: 'agreement.pdf',
         contentType: 'application/pdf',
         fileSizeBytes: 1_000_000,
@@ -94,7 +100,7 @@ describe('POST /api/documents/presign', () => {
     const request = new Request('http://localhost/api/documents/presign', {
       method: 'POST',
       body: JSON.stringify({
-        transactionId: '00000000-0000-0000-0000-000000000001',
+        transactionId: TX_ID,
         fileName: 'agreement.pdf',
         contentType: 'application/pdf',
         fileSizeBytes: 1_000_000,
