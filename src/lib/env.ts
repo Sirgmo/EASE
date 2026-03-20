@@ -41,6 +41,9 @@ const envSchema = z.object({
   STRIPE_PRICE_AI_DIY: z.string().startsWith('price_'),
   STRIPE_PRICE_AI_COORDINATOR: z.string().startsWith('price_'),
   STRIPE_PRICE_AI_FULL_SERVICE: z.string().startsWith('price_'),
+  // DocuSign e-signature integration (optional — accessed via process.env in docusign.ts,
+  // but DOCUSIGN_WEBHOOK_SECRET is needed in the webhook route via env object)
+  DOCUSIGN_WEBHOOK_SECRET: z.string().min(1).optional(),
 })
 
 export const env = envSchema.parse(process.env)
