@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
+import { boolean, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
 
 // users table — synced from Clerk via webhooks
 // Clerk is the source of truth for authentication.
@@ -11,6 +11,9 @@ export const users = pgTable('users', {
   lastName: text('last_name'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  // PIPEDA — AI data consent must be timestamped and opt-in
+  aiDataConsent: boolean('ai_data_consent').notNull().default(false),
+  aiDataConsentAt: timestamp('ai_data_consent_at', { withTimezone: true }),
 })
 
 export type User = typeof users.$inferSelect

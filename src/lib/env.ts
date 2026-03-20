@@ -44,6 +44,9 @@ const envSchema = z.object({
   // DocuSign e-signature integration (optional — accessed via process.env in docusign.ts,
   // but DOCUSIGN_WEBHOOK_SECRET is needed in the webhook route via env object)
   DOCUSIGN_WEBHOOK_SECRET: z.string().min(1).optional(),
+  // Anthropic AI (accessed via process.env directly in anthropic.ts to avoid Zod blocking
+  // cold-start in test environments where ANTHROPIC_API_KEY is absent — same pattern as CRON_SECRET)
+  ANTHROPIC_API_KEY: z.string().startsWith('sk-ant-').optional(),
 })
 
 export const env = envSchema.parse(process.env)
